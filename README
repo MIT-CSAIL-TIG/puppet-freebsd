@@ -1,0 +1,52 @@
+freebsd
+
+This is the freebsd module.  It contains classes, types, and facts useful
+for FreeBSD systems.
+
+What's in it
+------------
+* rc_conf, periodic_conf, loader_conf - manage the contents of the named
+files.  These are based on the examples from the Puppet Wiki, and depend
+on the shell_config type (defined in our shell_config module), which really
+should be a Puppet core type.  Note that the Augeas lens that shell_config
+currently depends on fails on loader.conf files that contain tunables,
+because the shell (unlike /boot/loader) doesn't allow dots in variable names.
+This will need to be fixed in the FreeBSD Augeas port or upstream Augeas;
+we use a custom hacked package.
+
+* ipfw - simple firewall configuration.  Currently this only implements the
+standard firewall types known by /etc/rc.firewall (and all it does is put
+the relevant thing into /etc/rc.conf); if you specify a pathname as the
+firewall type, a dependency will be created automatically (but it's up
+to you to define the resource); there are too many different ways firewall
+rules can be defined.  You might build a more complicated data model on top
+of this module.  It defines Service['firewall'].
+
+* pf - stub class for future use.  This class would implement the same
+interface for pf as the ipfw class does for the standard firewall, perhaps
+with some extra pf-specific features.  It also defines Service['firewall'].
+
+* localbase - a fact that determines the package prefix (by calling
+"pkg query", so pkgng is mandatory) so that Puppet modules do not need
+to hardcode this configuration variable.  So named because it's the
+counterpart to ${LOCALBASE} in bsd.port.mk.  It should be defined by
+the FreeBSD puppet port instead, and then it could be hard-coded to the
+correct value, eliminating a fork/exec from fact resolution.
+
+Features will be removed from this module if and when comparable features
+are added to mainline Puppet or to the FreeBSD puppet port.
+
+License
+-------
+With the exception of the three types derived from examples on the Puppet
+Wiki, all code and documentation is provided under the terms of the MIT
+license; see the file LICENSE.
+
+Contact
+-------
+vendor-puppet@csail.mit.edu
+
+Support
+-------
+You must be joking.
+
