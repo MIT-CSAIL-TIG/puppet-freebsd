@@ -10,7 +10,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
   text_line :comment, :match => /^\s*#/
   text_line :blank, :match => /^\s*$/
 
-  FORMAT = %r/^(\S+)\s+(?:([^:.[:space:]]+)[:.](\S+)\s+)?([0-7]+)\s+(\d+)\s+(\*|\d+)\s+(\*|(?:@\d*T\d*)|(?:\$(?:[MW]\d*)?D\d*)|\d+)\s+(-|[A-Za-z]+)(?:\s+(\/\S+)(?:\s+(\d+))?)?\s*$/
+  FORMAT = %r/^(\S+)\s+(?:([^:.[:space:]]+)[:.](\S+)\s+)?([0-7]+)\s+(\d+)\s+(\*|\d+)\s+(\*|(?:@\d*T\d*)|(?:\$(?:[MW]\d*)?D\d*)|\d+)(?:\s+(-|[A-Za-z]+))?(?:\s+(\/\S+)(?:\s+(\d+))?)?\s*$/
   FIELDS = %w{name owner group mode keep_old_files max_size rotation_schedule
 	      flags pid_file signal}
 
@@ -19,7 +19,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
     :fields => FIELDS,
     :match => FORMAT,
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) },
-    :optional => %w{owner group pid_file signal}
+    :optional => %w{owner group flags pid_file signal}
 
   def self.valid_ownership?(hash)
     hash[:owner] and hash[:group] and hash[:owner] != :absent and
@@ -46,9 +46,9 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
     end
     line += sprintf("%-4s %-5s %s\t%-6s %s", hash[:mode], hash[:keep_old_files],
 		    hash[:max_size] || '*', hash[:rotation_schedule] || '*', 
-		    hash[:flags] ? hash[:flags] : '-')
-    line += ' ' + hash[:pid_file] if hash[:pid_file]
-    line += ' ' + hash[:signal] if hash[:signal]
+		    (hash[:flags] and hash[:flags] != :absent) ? hash[:flags] : '-')
+    line += ' ' + hash[:pid_file] if hash[:pid_file] and hash[:pid_file] != :absent
+    line += ' ' + hash[:signal] if hash[:signal] and hash[:signal] != :absent
     line
   end
 end
