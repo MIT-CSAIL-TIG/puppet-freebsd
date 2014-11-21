@@ -45,6 +45,9 @@ Puppet::Type.newtype(:newsyslog) do
     defaultto '644'
 
     validate do |value|
+      unless value.is_a?(String)
+        raise Puppet::Error, "Mode must be a string (sorry!), got #{value.class}"
+      end
       return true if value =~ /^[0-7]+$/
       raise Puppet::Error, "Invalid mode #{value.inspect}"
     end
@@ -57,7 +60,8 @@ Puppet::Type.newtype(:newsyslog) do
 	be specified."
     defaultto do nil; end
     validate do |value|
-      return true if value == nil or value =~ /^[[:digit:]]$/
+      return true if value == nil or value.is_a?(Integer)
+      return true if value =~ /^[[:digit:]]$/
       raise Puppet::Error, "Invalid maximum size #{value.inspect}"
     end
   end
@@ -66,7 +70,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The number of old log files which should be kept."
     defaultto :missing
     validate do |value|
-      return true if value =~ /^[[:digit:]]$/
+      return true if value.is_a?(Integer) || value =~ /^[[:digit:]]$/
       raise Puppet::Error, "Invalid number of old files #{value.inspect}"
     end
   end
@@ -113,7 +117,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The signal to be sent to the process being notified about the
 	log rotation, as an integer.  If undefined, a SIGHUP is sent."
     validate do |value|
-      return true if value == :absent or value.nil?
+      return true if value == :absent or value.nil? or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
       raise Puppet::Error, "Invalid signal number #{value.inspect}"
     end
