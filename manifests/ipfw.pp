@@ -10,8 +10,8 @@ class freebsd::ipfw ($ensure = 'present', $type = 'open') {
   } ~> service {'firewall':
     name       => 'ipfw',
     enable     => $ensure == 'present',
-    hasstatus  => false,
     hasrestart => true,
+    status     => '/usr/bin/true',
   }
   if $type =~ /^\// {
     Service['firewall'] {
