@@ -4,7 +4,10 @@
 # construct the file, and as it's not required if you just want a normal
 # "open" configuration, we don't define that resource here.
 class freebsd::ipfw ($ensure = 'present', $type = 'open') {
-  service {'firewall':
+  freebsd::rc_conf {'firewall_type':
+    ensure => $ensure,
+    value  => $type,
+  } ~> service {'firewall':
     name       => 'ipfw',
     enable     => $ensure == 'present',
     hasstatus  => false,
@@ -16,5 +19,4 @@ class freebsd::ipfw ($ensure = 'present', $type = 'open') {
       subscribe => File[$type],
     }
   }
-  freebsd::rc_conf {'firewall_type': value => $type, ensure => $ensure, }
 }
