@@ -4,6 +4,6 @@
 Facter.add(:localbase ) do
   confine :osfamily => [ :FreeBSD ]  
   setcode do
-    Facter::Util::Resolution.exec('pkg query "%p" puppet')
+    Facter::Util::Resolution.exec('pkg query "%p" puppet38')
   end
 end
