@@ -21,6 +21,12 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) },
     :optional => %w{owner group flags pid_file signal}
 
+  record_line :include,
+    :absent => :absent,
+    :fields => %w{name},
+    :match => %r/^\s+<include>\s+(\S+)\s*$/,
+    :to_line => proc {|h| "<include> #{h[:name]}\n" }
+
   def self.valid_ownership?(hash)
     hash[:owner] and hash[:group] and hash[:owner] != :absent and
 	hash[:group] != :absent and hash[:owner] != 'absent' and
@@ -33,6 +39,11 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
       # were records
       return hash[:line]
     end
+
+    # Include directives are easy.
+    if hash[:record_type] == :include
+      return '<include> ' + hash[:name]
+   end
 
     if hash[:name].nil? or hash[:mode].nil? or hash[:keep_old_files].nil?
       raise Puppet::Error, "to_line: impossble #{hash.inspect}"

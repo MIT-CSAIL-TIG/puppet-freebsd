@@ -6,7 +6,11 @@ Puppet::Type.newtype(:newsyslog) do
 
   ensurable
   newparam(:name, :namevar => true) do
-    desc "The absoute path of the log file which is being rotated."
+    desc "The absoute path of the log file which is being rotated, when
+	record_type is 'log', or (when record_type is 'include') the
+	absolute path of the file to be included or a glob(3) expression
+	that matches the absolute paths of multiple files to be included,
+	as determined by the record_type parameter."
   end
 
   newproperty(:owner) do
