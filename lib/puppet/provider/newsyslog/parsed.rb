@@ -11,7 +11,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
   text_line :blank, :match => /^\s*$/
 
   FORMAT = %r/^(\/\S+)\s+(?:([^:.[:space:]]+)[:.](\S+)\s+)?([0-7]+)\s+(\d+)\s+(\*|\d+)\s+(\*|(?:@\d*T\d*)|(?:\$(?:[MW]\d*)?D\d*)|\d+)(?:\s+(-|[A-Za-z]+))?(?:\s+(\/\S+)(?:\s+(\d+))?)?\s*$/
-  FIELDS = %w{file owner group mode keep_old_files max_size rotation_schedule
+  FIELDS = %w{path owner group mode keep_old_files max_size rotation_schedule
 	      flags pid_file signal}
 
   record_line :log,
@@ -24,7 +24,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
 
   record_line :include,
     :absent => :absent,
-    :fields => %w{file},
+    :fields => %w{path},
     :match => %r/^\s*<include>\s+(\S+)\s*$/,
     :post_parse => proc {|h| h[:include] = true},
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) }
@@ -43,11 +43,11 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
     end
 
     # Include directives are easy.
-    if hash[:record_type] == :include
-      return '<include> ' + hash[:name]
+    if hash[:include]
+      return '<include> ' + hash[:path]
    end
 
-    if hash[:name].nil? or hash[:mode].nil? or hash[:keep_old_files].nil?
+    if hash[:path].nil? or hash[:mode].nil? or hash[:keep_old_files].nil?
       raise Puppet::Error, "to_line: impossble #{hash.inspect}"
     end
     line = nil

@@ -5,13 +5,13 @@ Puppet::Type.newtype(:newsyslog) do
   @doc = "Manage the configuration file for newsyslog(8)."
 
   ensurable
-  newparam(:file, :namevar => true) do
+  newparam(:path, :namevar => true) do
     desc "The absolute path of the log file which is being rotated, or
 	a glob(3) expression that matches the absolute path of one or
 	more configuration files to be included."
   end
 
-  newproperty(:include, :parent => Puppet::Property::Boolean) do
+  newparam(:include, :parent => Puppet::Property::Boolean) do
     desc "If true, this resource is an include directive and not
 	a log file to be rotated."
   end
