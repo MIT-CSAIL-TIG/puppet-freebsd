@@ -5,19 +5,13 @@ Puppet::Type.newtype(:newsyslog) do
   @doc = "Manage the configuration file for newsyslog(8)."
 
   ensurable
-  newparam(:name, :namevar => true) do
-    desc "The absoute path of the log file which is being rotated, when
-	record_type is 'log', or (when record_type is 'include') the
-	absolute path of the file to be included or a glob(3) expression
-	that matches the absolute paths of multiple files to be included,
-	as determined by the record_type parameter."
+  newparam(:file, :namevar => true) do
+    desc "The absoute path of the log file which is being rotated."
   end
 
-  newproperty(:record_type) do
-    desc "The type of newsyslog.conf entry this is (log or include)."
-    newvalues :text, :comment, :log, :include
-    defaultto :log
-    munge {|val| val.to_s.intern }
+  newparam(:include) do
+    desc "A glob(3) expression that matches the absolute path of
+	one or more configuration files to be included."
   end
 
   newproperty(:owner) do
@@ -27,7 +21,7 @@ Puppet::Type.newtype(:newsyslog) do
 	must also be undefined, but this is not checked.)"
 
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value == :absent or value.nil?
       return true unless value =~ /[.:]\s/
       Puppet::Util::Errors.fail "Invalid user #{value.inspect}"
@@ -41,7 +35,7 @@ Puppet::Type.newtype(:newsyslog) do
 	must also be undefined, but this is not checked.)"
 
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true if resource[:include]
       return true if value == :absent or value.nil?
       return true unless value =~ /[.:\s]/
       Puppet::Util::Errors.fail "Invalid group #{value.inspect}"
@@ -58,7 +52,7 @@ Puppet::Type.newtype(:newsyslog) do
     defaultto '644'
 
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       unless value.is_a?(String)
         Puppet::Util::Errors.fail "Mode must be a string (sorry!), got #{value.class}"
       end
@@ -74,7 +68,7 @@ Puppet::Type.newtype(:newsyslog) do
 	be specified."
     defaultto do nil; end
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value == nil or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
       Puppet::Util::Errors.fail "Invalid maximum size #{value.inspect}"
@@ -85,7 +79,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The number of old log files which should be kept."
     defaultto :missing
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value.is_a?(Integer) || value =~ /^[[:digit:]]$/
       Puppet::Util::Errors.fail "Invalid number of old files #{value.inspect}"
     end
@@ -102,7 +96,7 @@ Puppet::Type.newtype(:newsyslog) do
 	must be specified."
     defaultto do nil; end
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value.nil?
       return true unless value =~ /[[:space:]]/
       Puppet::Util::Errors.fail "Invalid rotation schedule #{value.inspect}"
@@ -113,7 +107,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "Various flags that should be handled separately."
     defaultto '-'
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value =~ /^(?:-|[A-Za-z]+)$/
     end
   end
@@ -123,7 +117,7 @@ Puppet::Type.newtype(:newsyslog) do
 	a daemon to notify after the log is rotated.  If undefined,
 	a signal will be sent to syslogd(8)."
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value == :absent or value.nil?
       return true if value[0] == '/' and value !~ /[[:space:]]/
       Puppet::Util::Errors.fail "Invalid PID file #{value.inspect}"
@@ -136,7 +130,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The signal to be sent to the process being notified about the
 	log rotation, as an integer.  If undefined, a SIGHUP is sent."
     validate do |value|
-      return true unless resource[:record_type] == :log
+      return true unless resource[:include]
       return true if value == :absent or value.nil? or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
       Puppet::Util::Errors.fail "Invalid signal number #{value.inspect}"

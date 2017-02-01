@@ -23,7 +23,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
 
   record_line :include,
     :absent => :absent,
-    :fields => %w{name},
+    :fields => %w{include},
     :match => %r/^\s*<include>\s+(\S+)\s*$/,
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) }
 
