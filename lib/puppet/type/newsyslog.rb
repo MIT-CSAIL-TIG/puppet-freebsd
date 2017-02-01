@@ -13,6 +13,11 @@ Puppet::Type.newtype(:newsyslog) do
 	as determined by the record_type parameter."
   end
 
+  newparam(:record_type) do
+    desc "The type of newsyslog.conf entry this is (log or include)."
+    newvalues :text, :comment, :log, :include
+  end
+
   newproperty(:owner) do
     desc "The ownership which should be assigned for newly-created
 	logs after rotation; may be undefined, in which case the default
