@@ -17,6 +17,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The type of newsyslog.conf entry this is (log or include)."
     newvalues :text, :comment, :log, :include
     defaultto :log
+    munge {|val| val.to_s.intern }
   end
 
   newproperty(:owner) do
