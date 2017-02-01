@@ -10,7 +10,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
   text_line :comment, :match => /^\s*#/
   text_line :blank, :match => /^\s*$/
 
-  FORMAT = %r/^(\S+)\s+(?:([^:.[:space:]]+)[:.](\S+)\s+)?([0-7]+)\s+(\d+)\s+(\*|\d+)\s+(\*|(?:@\d*T\d*)|(?:\$(?:[MW]\d*)?D\d*)|\d+)(?:\s+(-|[A-Za-z]+))?(?:\s+(\/\S+)(?:\s+(\d+))?)?\s*$/
+  FORMAT = %r/^(/\S+)\s+(?:([^:.[:space:]]+)[:.](\S+)\s+)?([0-7]+)\s+(\d+)\s+(\*|\d+)\s+(\*|(?:@\d*T\d*)|(?:\$(?:[MW]\d*)?D\d*)|\d+)(?:\s+(-|[A-Za-z]+))?(?:\s+(\/\S+)(?:\s+(\d+))?)?\s*$/
   FIELDS = %w{name owner group mode keep_old_files max_size rotation_schedule
 	      flags pid_file signal}
 
@@ -25,7 +25,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
     :absent => :absent,
     :fields => %w{name},
     :match => %r/^\s+<include>\s+(\S+)\s*$/,
-    :to_line => proc {|h| "<include> #{h[:name]}\n" }
+    :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) }
 
   def self.valid_ownership?(hash)
     hash[:owner] and hash[:group] and hash[:owner] != :absent and
