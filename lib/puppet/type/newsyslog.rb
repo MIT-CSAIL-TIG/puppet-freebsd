@@ -13,7 +13,7 @@ Puppet::Type.newtype(:newsyslog) do
 	as determined by the record_type parameter."
   end
 
-  newparam(:record_type) do
+  newproperty(:record_type) do
     desc "The type of newsyslog.conf entry this is (log or include)."
     newvalues :text, :comment, :log, :include
   end
