@@ -24,7 +24,7 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
   record_line :include,
     :absent => :absent,
     :fields => %w{name},
-    :match => %r/^\s+<include>\s+(\S+)\s*$/,
+    :match => %r/^\s*<include>\s+(\S+)\s*$/,
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) }
 
   def self.valid_ownership?(hash)
