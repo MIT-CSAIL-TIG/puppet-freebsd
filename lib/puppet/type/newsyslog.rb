@@ -20,9 +20,10 @@ Puppet::Type.newtype(:newsyslog) do
 	must also be undefined, but this is not checked.)"
 
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value == :absent or value.nil?
       return true unless value =~ /[.:]\s/
-      raise Puppet::Error, "Invalid user #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid user #{value.inspect}"
     end
   end
 
@@ -33,9 +34,10 @@ Puppet::Type.newtype(:newsyslog) do
 	must also be undefined, but this is not checked.)"
 
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value == :absent or value.nil?
       return true unless value =~ /[.:\s]/
-      raise Puppet::Error, "Invalid group #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid group #{value.inspect}"
     end
   end
 
@@ -49,11 +51,12 @@ Puppet::Type.newtype(:newsyslog) do
     defaultto '644'
 
     validate do |value|
+      return true unless resource[:record_type] == :log
       unless value.is_a?(String)
-        raise Puppet::Error, "Mode must be a string (sorry!), got #{value.class}"
+        Puppet::Util::Errors.fail "Mode must be a string (sorry!), got #{value.class}"
       end
       return true if value =~ /^[0-7]+$/
-      raise Puppet::Error, "Invalid mode #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid mode #{value.inspect}"
     end
   end
 
@@ -64,9 +67,10 @@ Puppet::Type.newtype(:newsyslog) do
 	be specified."
     defaultto do nil; end
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value == nil or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
-      raise Puppet::Error, "Invalid maximum size #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid maximum size #{value.inspect}"
     end
   end
 
@@ -74,8 +78,9 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The number of old log files which should be kept."
     defaultto :missing
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value.is_a?(Integer) || value =~ /^[[:digit:]]$/
-      raise Puppet::Error, "Invalid number of old files #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid number of old files #{value.inspect}"
     end
   end
 
@@ -90,9 +95,10 @@ Puppet::Type.newtype(:newsyslog) do
 	must be specified."
     defaultto do nil; end
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value.nil?
       return true unless value =~ /[[:space:]]/
-      raise Puppet::Error, "Invalid rotation schedule #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid rotation schedule #{value.inspect}"
     end
   end
 
@@ -100,6 +106,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "Various flags that should be handled separately."
     defaultto '-'
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value =~ /^(?:-|[A-Za-z]+)$/
     end
   end
@@ -109,9 +116,10 @@ Puppet::Type.newtype(:newsyslog) do
 	a daemon to notify after the log is rotated.  If undefined,
 	a signal will be sent to syslogd(8)."
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value == :absent or value.nil?
       return true if value[0] == '/' and value !~ /[[:space:]]/
-      raise Puppet::Error, "Invalid PID file #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid PID file #{value.inspect}"
     end
   end
 
@@ -121,9 +129,10 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The signal to be sent to the process being notified about the
 	log rotation, as an integer.  If undefined, a SIGHUP is sent."
     validate do |value|
+      return true unless resource[:record_type] == :log
       return true if value == :absent or value.nil? or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
-      raise Puppet::Error, "Invalid signal number #{value.inspect}"
+      Puppet::Util::Errors.fail "Invalid signal number #{value.inspect}"
     end
   end
 
