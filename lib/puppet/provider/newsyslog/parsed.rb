@@ -11,20 +11,22 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
   text_line :blank, :match => /^\s*$/
 
   FORMAT = %r/^(\/\S+)\s+(?:([^:.[:space:]]+)[:.](\S+)\s+)?([0-7]+)\s+(\d+)\s+(\*|\d+)\s+(\*|(?:@\d*T\d*)|(?:\$(?:[MW]\d*)?D\d*)|\d+)(?:\s+(-|[A-Za-z]+))?(?:\s+(\/\S+)(?:\s+(\d+))?)?\s*$/
-  FIELDS = %w{name owner group mode keep_old_files max_size rotation_schedule
+  FIELDS = %w{file owner group mode keep_old_files max_size rotation_schedule
 	      flags pid_file signal}
 
   record_line :log,
     :absent => :absent,
     :fields => FIELDS,
     :match => FORMAT,
+    :post_parse => proc {|h| h[:include] = false},
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) },
     :optional => %w{owner group flags pid_file signal}
 
   record_line :include,
     :absent => :absent,
-    :fields => %w{include},
+    :fields => %w{file},
     :match => %r/^\s*<include>\s+(\S+)\s*$/,
+    :post_parse => proc {|h| h[:include] = true},
     :to_line => proc {|h| Puppet::Type::Newsyslog::ProviderParsed.to_line(h) }
 
   def self.valid_ownership?(hash)

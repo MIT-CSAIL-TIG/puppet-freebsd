@@ -6,12 +6,14 @@ Puppet::Type.newtype(:newsyslog) do
 
   ensurable
   newparam(:file, :namevar => true) do
-    desc "The absoute path of the log file which is being rotated."
+    desc "The absolute path of the log file which is being rotated, or
+	a glob(3) expression that matches the absolute path of one or
+	more configuration files to be included."
   end
 
-  newparam(:include) do
-    desc "A glob(3) expression that matches the absolute path of
-	one or more configuration files to be included."
+  newproperty(:include, :parent => Puppet::Property::Boolean) do
+    desc "If true, this resource is an include directive and not
+	a log file to be rotated."
   end
 
   newproperty(:owner) do
@@ -52,7 +54,7 @@ Puppet::Type.newtype(:newsyslog) do
     defaultto '644'
 
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       unless value.is_a?(String)
         Puppet::Util::Errors.fail "Mode must be a string (sorry!), got #{value.class}"
       end
@@ -68,7 +70,7 @@ Puppet::Type.newtype(:newsyslog) do
 	be specified."
     defaultto do nil; end
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       return true if value == nil or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
       Puppet::Util::Errors.fail "Invalid maximum size #{value.inspect}"
@@ -79,7 +81,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The number of old log files which should be kept."
     defaultto :missing
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       return true if value.is_a?(Integer) || value =~ /^[[:digit:]]$/
       Puppet::Util::Errors.fail "Invalid number of old files #{value.inspect}"
     end
@@ -96,7 +98,7 @@ Puppet::Type.newtype(:newsyslog) do
 	must be specified."
     defaultto do nil; end
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       return true if value.nil?
       return true unless value =~ /[[:space:]]/
       Puppet::Util::Errors.fail "Invalid rotation schedule #{value.inspect}"
@@ -107,7 +109,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "Various flags that should be handled separately."
     defaultto '-'
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       return true if value =~ /^(?:-|[A-Za-z]+)$/
     end
   end
@@ -117,7 +119,7 @@ Puppet::Type.newtype(:newsyslog) do
 	a daemon to notify after the log is rotated.  If undefined,
 	a signal will be sent to syslogd(8)."
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       return true if value == :absent or value.nil?
       return true if value[0] == '/' and value !~ /[[:space:]]/
       Puppet::Util::Errors.fail "Invalid PID file #{value.inspect}"
@@ -130,7 +132,7 @@ Puppet::Type.newtype(:newsyslog) do
     desc "The signal to be sent to the process being notified about the
 	log rotation, as an integer.  If undefined, a SIGHUP is sent."
     validate do |value|
-      return true unless resource[:include]
+      return true if resource[:include]
       return true if value == :absent or value.nil? or value.is_a?(Integer)
       return true if value =~ /^[[:digit:]]$/
       Puppet::Util::Errors.fail "Invalid signal number #{value.inspect}"
