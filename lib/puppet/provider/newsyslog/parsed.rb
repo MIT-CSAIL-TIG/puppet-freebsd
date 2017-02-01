@@ -52,10 +52,10 @@ Puppet::Type.type(:newsyslog).provide(:parsed,
     end
     line = nil
     if self.valid_ownership?(hash)
-      line = sprintf("%-23s %-15s ", hash[:name], 
+      line = sprintf("%-23s %-15s ", hash[:path], 
 		     hash[:owner] + ':' + hash[:group])
     else
-      line = sprintf("%-39s ", hash[:name])
+      line = sprintf("%-39s ", hash[:path])
     end
     line += sprintf("%-4s %-5s %s\t%-6s %s", hash[:mode], hash[:keep_old_files],
 		    hash[:max_size] || '*', hash[:rotation_schedule] || '*', 

@@ -11,7 +11,7 @@ Puppet::Type.newtype(:newsyslog) do
 	more configuration files to be included."
   end
 
-  newparam(:include, :parent => Puppet::Property::Boolean) do
+  newparam(:include, :boolean => true, :parent => Puppet::Parameter::Boolean) do
     desc "If true, this resource is an include directive and not
 	a log file to be rotated."
     defaultto false
